@@ -1,0 +1,13 @@
+---
+# Main playbook for CI/CD environment
+- hosts: jenkins
+  become: yes
+  roles:
+    - geerlingguy.java
+    - geerlingguy.jenkins
+    - jenkins-config
+
+- hosts: webapp
+  become: yes
+  roles:
+    - webapp

@@ -1,0 +1,25 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <description>Deploy WebApp using Ansible</description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+# SSH to Ansible master and run the webapp playbook
+ssh -o StrictHostKeyChecking=no {{ ansible_user }}@{{ groups['ansible'][0] }} &apos;cd /home/vagrant/ansible &amp;&amp; ansible-playbook site.yml --limit webapp&apos;
+
+echo "WebApp deployed at: http://{{ groups['webapp'][0] }}"
+      </command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

@@ -1,0 +1,61 @@
+---
+# Tasks for jenkins-config role
+- name: Open firewall for Jenkins
+  ansible.posix.firewalld:
+    port: 8080/tcp
+    permanent: yes
+    state: enabled
+    immediate: yes
+
+- name: Create Jenkins jobs directory
+  file:
+    path: "/var/lib/jenkins/jobs/{{ item }}"
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0755'
+  with_items:
+    - deploy-webapp
+
+- name: Create Jenkins job config directories
+  file:
+    path: "/var/lib/jenkins/jobs/{{ item }}"
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0755'
+  with_items:
+    - deploy-webapp
+
+- name: Deploy Jenkins job configuration
+  template:
+    src: deploy-webapp-job.xml.j2
+    dest: /var/lib/jenkins/jobs/deploy-webapp/config.xml
+    owner: jenkins
+    group: jenkins
+    mode: '0644'
+  notify: restart jenkins
+
+- name: Ensure Jenkins .ssh directory exists
+  file:
+    path: /var/lib/jenkins/.ssh
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0700'
+
+- name: Fetch SSH key from Ansible master
+  fetch:
+    src: /home/vagrant/.ssh/id_rsa
+    dest: /tmp/id_rsa
+    flat: yes
+  delegate_to: "{{ groups['ansible'][0] }}"
+
+- name: Copy SSH key to Jenkins
+  copy:
+    src: /tmp/id_rsa
+    dest: /var/lib/jenkins/.ssh/id_rsa
+    owner: jenkins
+    group: jenkins
+    mode: '0600'
+

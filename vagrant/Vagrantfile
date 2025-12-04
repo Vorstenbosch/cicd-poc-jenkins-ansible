@@ -1,0 +1,81 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Use Rocky Linux 9 as the base box (modern CentOS replacement)
+  config.vm.box = "generic/rocky9"
+  
+  # SSH configuration
+  config.ssh.insert_key = false
+  config.ssh.private_key_path = ["ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
+  config.vm.provision "file", source: "ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+
+  # Jenkins Server
+  config.vm.define "jenkins" do |jenkins|
+    jenkins.vm.hostname = "jenkins"
+    jenkins.vm.network "private_network", ip: "192.168.56.10"
+    
+    jenkins.vm.provider "virtualbox" do |vb|
+      vb.name = "jenkins"
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+  end
+
+  # Ansible Master Server
+  config.vm.define "ansible" do |ansible|
+    ansible.vm.hostname = "ansible-master"
+    ansible.vm.network "private_network", ip: "192.168.56.11"
+    
+    # Synced folder for Ansible playbooks (only on ansible VM)
+    ansible.vm.synced_folder "../ansible", "/vagrant/ansible", type: "virtualbox"
+    
+    ansible.vm.provider "virtualbox" do |vb|
+      vb.name = "ansible-master"
+      vb.memory = "512"
+      vb.cpus = 1
+    end
+    
+    # Copy SSH key to vagrant user
+    ansible.vm.provision "file", source: "ssh/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
+    
+    ansible.vm.provision "shell", inline: <<-SHELL
+      # Install Ansible
+      dnf install -y epel-release
+      dnf install -y ansible
+      
+      # Install Java (required for Jenkins agent)
+      dnf install -y java-11-openjdk
+      
+      # Create Jenkins agent directory
+      mkdir -p /var/jenkins
+      chown vagrant:vagrant /var/jenkins
+      
+      # Fix SSH key permissions
+      chmod 600 /home/vagrant/.ssh/id_rsa
+      chown vagrant:vagrant /home/vagrant/.ssh/id_rsa
+      
+      # Refresh playbooks and fix ansible directory permissions
+      rm -rf /home/vagrant/ansible
+      cp -r /vagrant/ansible /home/vagrant/ansible
+      chmod 700 /home/vagrant/ansible
+      chown -R vagrant:vagrant /home/vagrant/ansible 
+      
+      echo "Ansible is installed"
+      ansible --version
+      echo "Jenkins agent workspace ready at /var/jenkins"
+    SHELL
+  end
+
+  # Web Application Server
+  config.vm.define "webapp" do |webapp|
+    webapp.vm.hostname = "webapp"
+    webapp.vm.network "private_network", ip: "192.168.56.12"
+    
+    webapp.vm.provider "virtualbox" do |vb|
+      vb.name = "webapp"
+      vb.memory = "512"
+      vb.cpus = 1
+    end
+  end
+end

@@ -1,0 +1,6 @@
+---
+# Tasks for webapp role
+# Add your webapp deployment tasks here
+- name: Print a message
+  debug:
+    msg: "Hello, this is a debug message"

@@ -1,0 +1,13 @@
+[jenkins]
+192.168.56.10
+
+[ansible]
+192.168.56.11
+
+[webapp]
+192.168.56.12
+
+[all:vars]
+ansible_user=vagrant
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'

@@ -1,0 +1,6 @@
+---
+# Handler to restart Jenkins
+- name: restart jenkins
+  systemd:
+    name: jenkins
+    state: restarted
