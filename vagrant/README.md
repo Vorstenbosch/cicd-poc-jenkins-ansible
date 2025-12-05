@@ -27,7 +27,7 @@ This Vagrant configuration creates a complete CI/CD environment with four machin
 
 ## Base OS
 
-All machines run **Rocky Linux 10** (modern CentOS replacement, supported until 2035)
+All machines run **Rocky Linux 9** (modern CentOS replacement, supported until 2032)
 
 ## Getting Started
 

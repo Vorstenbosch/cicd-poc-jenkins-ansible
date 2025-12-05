@@ -2,8 +2,8 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  # Use Rocky Linux 10 as the base box
-  config.vm.box = "generic/rocky10"
+  # Use Rocky Linux 9 as the base box
+  config.vm.box = "generic/rocky9"
   
   # SSH configuration
   config.ssh.insert_key = false
@@ -56,6 +56,13 @@ Vagrant.configure("2") do |config|
       
       echo "Ansible is installed"
       ansible --version
+    SHELL
+    
+    # Run Ansible as vagrant user (separate provisioner)
+    ansible.vm.provision "shell", privileged: false, inline: <<-SHELL
+      cd ~/ansible
+      ansible-galaxy install -r requirements.yml
+      ansible-playbook site.yml --limit jenkins,jenkins_agents
     SHELL
   end
 
