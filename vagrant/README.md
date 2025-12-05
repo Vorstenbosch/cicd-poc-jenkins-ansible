@@ -5,20 +5,24 @@ This Vagrant configuration creates a complete CI/CD environment with three machi
 ## Machines
 
 1. **Jenkins Server** (192.168.56.10)
-   - 2 GB RAM, 2 CPUs
+   - 1 GB RAM, 1 CPU
    - Jenkins CI/CD server
    - Access: http://192.168.56.10:8080
 
 2. **Ansible Master** (192.168.56.11)
-   - 1 GB RAM, 1 CPU
+   - 512 MB RAM, 1 CPU
    - Ansible automation controller
+   - Jenkins agent workspace at /var/jenkins
    - Pre-configured with inventory for Jenkins and WebApp servers
 
 3. **Web Application Server** (192.168.56.12)
-   - 1 GB RAM, 1 CPU
-   - Nginx web server
-   - Python 3 environment
+   - 512 MB RAM, 1 CPU
+   - Minimal Rocky Linux 9
    - Access: http://192.168.56.12
+
+## Base OS
+
+All machines run **Rocky Linux 9** (modern CentOS replacement, supported until 2032)
 
 ## Getting Started
 
@@ -62,12 +66,22 @@ These keys are automatically configured for:
    vagrant ssh jenkins
    sudo cat /var/lib/jenkins/secrets/initialAdminPassword
    ```
+3. Or use the credentials configured via Ansible:
+   - Username: `admin`
+   - Password: `admin` (if configured in group_vars/jenkins.yml)
 
 ### Ansible Usage
 
 SSH into the Ansible master:
 ```bash
 vagrant ssh ansible
+```
+
+Deploy Jenkins:
+```bash
+cd ~/ansible
+ansible-galaxy install -r requirements.yml
+ansible-playbook site.yml --limit jenkins
 ```
 
 Test connectivity:
