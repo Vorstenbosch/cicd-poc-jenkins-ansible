@@ -1,0 +1,12 @@
+---
+# Configuration for Jenkins agents with Docker support
+docker_users:
+  - vagrant
+
+# Docker configuration
+docker_install_compose: true
+docker_compose_version: "2.23.0"
+
+# Ensure vagrant user can run docker
+docker_daemon_options:
+  storage-driver: "overlay2"

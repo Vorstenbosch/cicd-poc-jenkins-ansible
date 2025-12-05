@@ -7,6 +7,12 @@
     - geerlingguy.jenkins
     - jenkins-config
 
+- hosts: jenkins_agents
+  become: yes
+  roles:
+    - geerlingguy.java
+    - geerlingguy.docker
+
 - hosts: webapp
   become: yes
   roles:

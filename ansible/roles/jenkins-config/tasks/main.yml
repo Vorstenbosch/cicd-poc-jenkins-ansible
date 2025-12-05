@@ -7,6 +7,27 @@
     state: enabled
     immediate: yes
 
+- name: Create Jenkins jobs directory for git repos
+  file:
+    path: "/var/lib/jenkins/jobs/{{ item.name }}"
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0755'
+  loop: "{{ jenkins_git_repos }}"
+  when: jenkins_git_repos is defined
+
+- name: Deploy Jenkins job configuration for git repos
+  template:
+    src: git-build-job.xml.j2
+    dest: "/var/lib/jenkins/jobs/{{ item.name }}/config.xml"
+    owner: jenkins
+    group: jenkins
+    mode: '0644'
+  loop: "{{ jenkins_git_repos }}"
+  when: jenkins_git_repos is defined
+  notify: restart jenkins
+
 - name: Create Jenkins jobs directory
   file:
     path: "/var/lib/jenkins/jobs/{{ item }}"

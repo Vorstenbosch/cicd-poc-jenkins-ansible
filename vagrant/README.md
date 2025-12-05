@@ -1,6 +1,6 @@
 # Vagrant CI/CD Environment
 
-This Vagrant configuration creates a complete CI/CD environment with three machines:
+This Vagrant configuration creates a complete CI/CD environment with four machines:
 
 ## Machines
 
@@ -12,17 +12,22 @@ This Vagrant configuration creates a complete CI/CD environment with three machi
 2. **Ansible Master** (192.168.56.11)
    - 512 MB RAM, 1 CPU
    - Ansible automation controller
-   - Jenkins agent workspace at /var/jenkins
-   - Pre-configured with inventory for Jenkins and WebApp servers
+   - Pre-configured with inventory for all servers
 
-3. **Web Application Server** (192.168.56.12)
+3. **Jenkins Agent** (192.168.56.13)
    - 512 MB RAM, 1 CPU
-   - Minimal Rocky Linux 9
+   - Jenkins build agent
+   - Java 17 runtime
+   - Workspace at /var/jenkins
+
+4. **Web Application Server** (192.168.56.12)
+   - 512 MB RAM, 1 CPU
+   - Minimal Rocky Linux 10
    - Access: http://192.168.56.12
 
 ## Base OS
 
-All machines run **Rocky Linux 9** (modern CentOS replacement, supported until 2032)
+All machines run **Rocky Linux 10** (modern CentOS replacement, supported until 2035)
 
 ## Getting Started
 
@@ -39,11 +44,13 @@ vagrant up
 # Start individual machines
 vagrant up jenkins
 vagrant up ansible
+vagrant up jenkins-agent
 vagrant up webapp
 
 # SSH into machines
 vagrant ssh jenkins
 vagrant ssh ansible
+vagrant ssh jenkins-agent
 vagrant ssh webapp
 ```
 
@@ -111,6 +118,7 @@ All machines are on a private network (192.168.56.0/24):
 - Jenkins: 192.168.56.10
 - Ansible: 192.168.56.11
 - WebApp: 192.168.56.12
+- Jenkins Agent: 192.168.56.13
 
 ## Troubleshooting
 

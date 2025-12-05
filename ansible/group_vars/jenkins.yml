@@ -15,6 +15,8 @@ jenkins_plugins:
   - workflow-aggregator
   - ssh-slaves
   - publish-over-ssh
+  - docker-workflow
+  - docker-plugin
 
 # Additional Jenkins settings
 jenkins_plugins_install_dependencies: true

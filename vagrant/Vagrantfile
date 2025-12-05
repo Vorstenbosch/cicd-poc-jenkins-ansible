@@ -2,8 +2,8 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  # Use Rocky Linux 9 as the base box (modern CentOS replacement)
-  config.vm.box = "generic/rocky9"
+  # Use Rocky Linux 10 as the base box
+  config.vm.box = "generic/rocky10"
   
   # SSH configuration
   config.ssh.insert_key = false
@@ -44,13 +44,6 @@ Vagrant.configure("2") do |config|
       dnf install -y epel-release
       dnf install -y ansible
       
-      # Install Java (required for Jenkins agent)
-      dnf install -y java-11-openjdk
-      
-      # Create Jenkins agent directory
-      mkdir -p /var/jenkins
-      chown vagrant:vagrant /var/jenkins
-      
       # Fix SSH key permissions
       chmod 600 /home/vagrant/.ssh/id_rsa
       chown vagrant:vagrant /home/vagrant/.ssh/id_rsa
@@ -63,8 +56,19 @@ Vagrant.configure("2") do |config|
       
       echo "Ansible is installed"
       ansible --version
-      echo "Jenkins agent workspace ready at /var/jenkins"
     SHELL
+  end
+
+  # Jenkins Agent
+  config.vm.define "jenkins-agent" do |agent|
+    agent.vm.hostname = "jenkins-agent"
+    agent.vm.network "private_network", ip: "192.168.56.13"
+    
+    agent.vm.provider "virtualbox" do |vb|
+      vb.name = "jenkins-agent"
+      vb.memory = "512"
+      vb.cpus = 1
+    end
   end
 
   # Web Application Server

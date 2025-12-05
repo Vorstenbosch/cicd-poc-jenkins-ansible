@@ -1,0 +1,7 @@
+---
+# Git repositories to monitor and build
+# Each repo should have a Jenkinsfile in its root
+jenkins_git_repos:
+  - name: "cicd-poc-jenkins-ansible"
+    url: "https://github.com/Vorstenbosch/cicd-poc-jenkins-ansible.git"
+    branch: "main"
