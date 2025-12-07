@@ -22,7 +22,19 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  # Ansible Master Server
+  # Jenkins Agent
+  config.vm.define "jenkins-agent" do |agent|
+    agent.vm.hostname = "jenkins-agent"
+    agent.vm.network "private_network", ip: "192.168.56.13"
+    
+    agent.vm.provider "virtualbox" do |vb|
+      vb.name = "jenkins-agent"
+      vb.memory = "512"
+      vb.cpus = 1
+    end
+  end
+
+  # Ansible Master Server (last so all other VMs are up when it provisions)
   config.vm.define "ansible" do |ansible|
     ansible.vm.hostname = "ansible-master"
     ansible.vm.network "private_network", ip: "192.168.56.11"
@@ -64,18 +76,6 @@ Vagrant.configure("2") do |config|
       ansible-galaxy install -r requirements.yml
       ansible-playbook site.yml --limit jenkins,jenkins_agents
     SHELL
-  end
-
-  # Jenkins Agent
-  config.vm.define "jenkins-agent" do |agent|
-    agent.vm.hostname = "jenkins-agent"
-    agent.vm.network "private_network", ip: "192.168.56.13"
-    
-    agent.vm.provider "virtualbox" do |vb|
-      vb.name = "jenkins-agent"
-      vb.memory = "512"
-      vb.cpus = 1
-    end
   end
 
   # Web Application Server
