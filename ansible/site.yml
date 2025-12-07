@@ -12,6 +12,7 @@
   roles:
     - geerlingguy.java
     - geerlingguy.docker
+    - jenkins-agent
 
 - hosts: webapp
   become: yes

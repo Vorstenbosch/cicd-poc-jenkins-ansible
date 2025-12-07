@@ -3,6 +3,7 @@ pipeline {
         docker {
             image 'python:3.11-slim'
             label 'jenkins-agent'
+            args '-u root:root'
         }
     }
     

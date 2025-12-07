@@ -1,5 +1,10 @@
 ---
 # Tasks for jenkins-config role
+- name: Install git on Jenkins server
+  dnf:
+    name: git
+    state: present
+
 - name: Open firewall for Jenkins
   ansible.posix.firewalld:
     port: 8080/tcp
@@ -79,4 +84,63 @@
     owner: jenkins
     group: jenkins
     mode: '0600'
+
+- name: Create Jenkins init.groovy.d directory
+  file:
+    path: /var/lib/jenkins/init.groovy.d
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0755'
+
+- name: Deploy credential initialization script
+  copy:
+    src: init-credentials.groovy
+    dest: /var/lib/jenkins/init.groovy.d/init-credentials.groovy
+    owner: jenkins
+    group: jenkins
+    mode: '0644'
+  notify: restart jenkins
+
+- name: Flush handlers to restart Jenkins now
+  meta: flush_handlers
+
+- name: Wait for Jenkins to be fully started after restart
+  uri:
+    url: "http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/login"
+    status_code: 200
+    timeout: 5
+  register: result
+  until: result.status == 200
+  retries: 60
+  delay: 5
+
+
+
+- name: Create Jenkins nodes directory
+  file:
+    path: /var/lib/jenkins/nodes/{{ item.name }}
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0755'
+  loop:
+    - { name: 'jenkins-agent', host: '192.168.56.13', label: 'jenkins-agent' }
+  when: groups['jenkins_agents'] is defined
+
+- name: Deploy Jenkins agent node configuration
+  template:
+    src: jenkins-agent-node.xml.j2
+    dest: /var/lib/jenkins/nodes/{{ item.name }}/config.xml
+    owner: jenkins
+    group: jenkins
+    mode: '0644'
+  loop:
+    - { name: 'jenkins-agent', host: '192.168.56.13', label: 'jenkins-agent' }
+  vars:
+    agent_name: "{{ item.name }}"
+    agent_host: "{{ item.host }}"
+    agent_label: "{{ item.label }}"
+  when: groups['jenkins_agents'] is defined
+  notify: restart jenkins
 

@@ -9,3 +9,8 @@ roles:
   
   - name: geerlingguy.docker
     version: 7.4.1
+
+# Collections
+collections:
+  - name: ansible.posix
+    version: "1.5.4"

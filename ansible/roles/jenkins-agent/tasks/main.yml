@@ -1,0 +1,16 @@
+---
+# Tasks for jenkins-agent role
+- name: Install required packages on agent
+  dnf:
+    name:
+      - java-17-openjdk-headless
+      - git
+    state: present
+
+- name: Create Jenkins agent workspace directory
+  file:
+    path: /home/vagrant/jenkins
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
