@@ -12,7 +12,7 @@ pipeline {
             steps {
                 sh '''
                     apt-get update
-                    apt-get install -y ruby
+                    apt-get install -y ruby ruby-dev build-essential
                     pip install ansible-lint
                     gem install rubocop
                 '''
